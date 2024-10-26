@@ -19,12 +19,16 @@ dependencies = [
     "rootutils>=1.0.7",
     "tensorboard>=2.18.0",
     "timm>=1.0.9",
-    "torch>=2.4.1",
+    "torch>=2.4.1+cpu",
     "torchmetrics>=1.4.2",
-    "torchvision>=0.19.1",
+    "torchvision>=0.19.1+cpu",
 ]
 
-   [tool.uv]
-   exclude = [
-       "pytorch-lightning",
-   ]
+[tool.uv]
+exclude = [
+    "pytorch-lightning",
+]
+
+[tool.coverage.report]
+include = ["src/**/*.py"]
+show_missing = true
