@@ -23,10 +23,6 @@ dependencies = [
     "torchvision==0.19.1+cpu",
 ]
 
-[tool.uv]
-exclude = [
-    "pytorch-lightning",
-]
 
 [tool.coverage.report]
 include = ["src/**/*.py"]
