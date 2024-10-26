@@ -12,7 +12,7 @@ env:
   IMAGE_NAME: ${{github.repository}}
 
 jobs:
-  test_and_train:
+  test:
     runs-on: ubuntu-latest
     
     steps:
@@ -46,7 +46,7 @@ jobs:
         fail_ci_if_error: true
 
   build_and_push:
-    needs: test_and_train
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
