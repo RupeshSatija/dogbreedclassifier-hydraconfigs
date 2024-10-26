@@ -9,10 +9,9 @@ from omegaconf import DictConfig
 from PIL import Image
 from torchvision import transforms
 
-from models.dogbreed_classifier import DogBreedGenericClassifier
-from utils.utils import get_rich_progress, setup_logger, task_wrapper
-
 root = rootutils.setup_root(__file__, pythonpath=True)
+from src.models.dogbreed_classifier import DogBreedGenericClassifier
+from src.utils.utils import get_rich_progress, setup_logger, task_wrapper
 
 
 @task_wrapper
