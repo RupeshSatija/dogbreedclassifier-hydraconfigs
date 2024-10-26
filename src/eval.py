@@ -6,12 +6,10 @@ import rootutils
 from lightning.pytorch.loggers import TensorBoardLogger
 from omegaconf import DictConfig
 
-from datamodules.dogbreed_dataset import DogBreedDataModule
-from models.dogbreed_classifier import DogBreedGenericClassifier
-from utils.utils import setup_logger
-
 # Setup the root of the project
 root = rootutils.setup_root(__file__, pythonpath=True)
+from src.datamodules.dogbreed_dataset import DogBreedDataModule
+from src.models.dogbreed_classifier import DogBreedGenericClassifier
 from src.utils.utils import (
     instantiate_datamodule,
     setup_logger,
