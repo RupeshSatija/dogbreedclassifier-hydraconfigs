@@ -1,31 +1,41 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+# Build stage
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS builder
 
-# Set the working directory in the container
+ENV UV_EXTRA_INDEX_URL=https://download.pytorch.org/whl/cpu
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Install dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
 
-# Install uv
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# Copy the rest of the application
+COPY . /app
 
-# Add uv to PATH
-ENV PATH="/root/.cargo/bin:${PATH}"
+# Install the project and its dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
 
-# Copy pyproject.toml and uv.lock
-COPY pyproject.toml uv.lock ./
+# Final stage
+FROM python:3.12-slim-bookworm
 
-# Create a virtual environment and install dependencies
-RUN uv venv && \
-    . .venv/bin/activate && \
-    uv pip install -e . && \
-    uv pip install --upgrade pip    
+# Create a non-root user
+RUN useradd -m app
 
-# Copy the rest of the application code
-COPY src ./src
+# Copy the application from the builder
+COPY --from=builder --chown=app:app /app /app
+
+# Set the working directory
+WORKDIR /app
+
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Switch to non-root user
+USER app
 
 # Set up the entrypoint to activate the virtual environment
 ENTRYPOINT ["/bin/bash", "-c", "source .venv/bin/activate && exec $0 $@"]

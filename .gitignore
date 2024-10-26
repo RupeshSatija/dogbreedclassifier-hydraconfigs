@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Model checkpoints and logs
+checkpoints/
+logs/
+
+# Data
+*.csv
+*.json
+*.pkl
+
+# Environment variables
+.env
+
+# Docker
+.dockerignore
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
