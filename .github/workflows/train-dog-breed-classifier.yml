@@ -2,9 +2,10 @@ name: Train Dog Breed Classifier
 
 on:
   workflow_run:
-    workflows: ["Test Classifier Code and Create Docker Image"]  # Name of the first workflow
+    workflows: ["Test Classifier Code and Create Docker Image"]
     types:
-      - completed  # Trigger this workflow when the first one completes
+      - completed
+    branches: [main]  # Add this to specify which branch to run on
 
 env:
   REGISTRY: ghcr.io
@@ -12,8 +13,13 @@ env:
 
 jobs:
   train:
+    # Only run if the previous workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-
+    permissions:  # Add explicit permissions
+      contents: read
+      packages: read
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,17 +38,32 @@ jobs:
         run: |
           IMAGE_NAME_LOWER=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
           docker pull ${{ env.REGISTRY }}/$IMAGE_NAME_LOWER:dogbreed-classifier-withhydraconfigs
+          echo "Using image: ${{ env.REGISTRY }}/$IMAGE_NAME_LOWER:dogbreed-classifier-withhydraconfigs"
 
       - name: Run Training
         id: training
         run: |
           IMAGE_NAME_LOWER=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
-          docker run --rm ${{ env.REGISTRY }}/$IMAGE_NAME_LOWER:dogbreed-classifier-withhydraconfigs python src/train.py trainer.max_epochs=5 model.model_name=resnet18
+          mkdir -p logs
+          docker run --rm \
+            -v ${PWD}/logs:/workspace/logs \
+            ${{ env.REGISTRY }}/$IMAGE_NAME_LOWER:dogbreed-classifier-withhydraconfigs \
+            python src/train.py trainer.max_epochs=5 model.model_name=resnet18
+        timeout-minutes: 60  # Add timeout to prevent hanging
 
       - name: Check Accuracy
         run: |
+          if [ ! -f logs/train.log ]; then
+            echo "Error: logs/train.log file not found!"
+            exit 1
+          fi
+          
           # Extract test accuracy from the log file
-          TEST_ACC=$(grep -o "'test/acc': [0-9.]*" logs/train.log | grep -o '[0-9.]*')
+          TEST_ACC=$(grep -o "'test/acc': [0-9.]*" logs/train.log | tail -1 | grep -o '[0-9.]*')
+          if [ -z "$TEST_ACC" ]; then
+            echo "Error: Could not find test accuracy in log file!"
+            exit 1
+          fi
           echo "Test Accuracy: $TEST_ACC"
           
           # Convert to percentage (multiply by 100)
@@ -58,9 +79,12 @@ jobs:
           fi
 
       - name: Upload Artifacts
+        if: always()  # Upload logs even if training fails
         uses: actions/upload-artifact@v4
         with:
           name: model-artifacts
           path: |
             ./logs/train/dogbreed_classifier/runs/*/checkpoints/*.ckpt
             ./logs/train/dogbreed_classifier/runs/*/tensorboard/
+            ./logs/train.log
+          retention-days: 7  # Add retention period
