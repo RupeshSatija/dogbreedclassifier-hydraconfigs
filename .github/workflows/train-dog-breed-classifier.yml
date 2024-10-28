@@ -2,7 +2,7 @@ name: Train Dog Breed Classifier
 
 on:
   workflow_run:
-    workflows: ["Train Dog Classifier Model and Run Tests"]  # Name of the first workflow
+    workflows: ["Test Classifier Code and Create Docker Image"]  # Name of the first workflow
     types:
       - completed  # Trigger this workflow when the first one completes
 
@@ -36,17 +36,24 @@ jobs:
       - name: Run Training
         id: training
         run: |
-          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dogbreed-classifier-withhydraconfigs python src/train.py +max_epochs=5 +model_name=resnet18 --output_dir ./output
-          # Assuming src/train.py is your training script and it outputs logs and checkpoints to ./output
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dogbreed-classifier-withhydraconfigs python src/train.py trainer.max_epochs=5 model.model_name=resnet18
 
       - name: Check Accuracy
         run: |
-          # Assuming your training script outputs accuracy to a file or prints it
-          accuracy=$(cat ./output/accuracy.txt)  # Adjust this to your actual output method
-          echo "Accuracy: $accuracy"
-          if (( $(echo "$accuracy < 95" | bc -l) )); then
+          # Extract test accuracy from the log file
+          TEST_ACC=$(grep -o "'test/acc': [0-9.]*" logs/train.log | grep -o '[0-9.]*')
+          echo "Test Accuracy: $TEST_ACC"
+          
+          # Convert to percentage (multiply by 100)
+          ACC_PERCENTAGE=$(echo "$TEST_ACC * 100" | bc)
+          echo "Accuracy Percentage: $ACC_PERCENTAGE%"
+          
+          # Check if accuracy is less than 95%
+          if (( $(echo "$ACC_PERCENTAGE < 95" | bc -l) )); then
             echo "Training failed: Accuracy is less than 95%"
             exit 1
+          else
+            echo "Training passed: Accuracy is above 95%"
           fi
 
       - name: Upload Artifacts
@@ -54,6 +61,5 @@ jobs:
         with:
           name: model-artifacts
           path: |
-            ./output/checkpoint.pth  # Adjust to your actual checkpoint file
-            ./output/logs/  # Adjust to your actual logs directory
-            ./output/config.yaml  # Adjust to your actual config file
+            ./logs/train/dogbreed_classifier/runs/*/checkpoints/*.ckpt
+            ./logs/train/dogbreed_classifier/runs/*/tensorboard/

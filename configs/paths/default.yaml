@@ -10,7 +10,7 @@ data_dir: ${paths.root_dir}/data/
 log_dir: ${paths.root_dir}/logs/
 
 # path to output directory
-output_dir: ${paths.root_dir}/outputs/
+output_dir: ${hydra:runtime.output_dir}
 
 # path to working directory
 work_dir: ${hydra:runtime.cwd}
