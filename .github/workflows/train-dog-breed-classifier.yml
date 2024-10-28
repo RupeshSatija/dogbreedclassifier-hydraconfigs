@@ -46,7 +46,7 @@ jobs:
           IMAGE_NAME_LOWER=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
           mkdir -p logs
           docker run --rm \
-            -v ${PWD}/logs:/workspace/logs \
+            -v ${PWD}/logs:/app/logs \
             ${{ env.REGISTRY }}/$IMAGE_NAME_LOWER:dogbreed-classifier-withhydraconfigs \
             python src/train.py trainer.max_epochs=5 model.model_name=resnet18
         timeout-minutes: 60  # Add timeout to prevent hanging
