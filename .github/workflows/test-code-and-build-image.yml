@@ -1,4 +1,4 @@
-name: Train Dog Classifier Model and Run Tests
+name: Test Classifier Code and Create Docker Image
 
 on:
   push:
