@@ -23,12 +23,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 FROM python:3.12-slim-bookworm
 
 # Create a non-root user
-RUN useradd -m app
+# RUN useradd -m app
 
 # Create necessary directories and set permissions
-RUN mkdir -p /app && \
-    chown -R app:app /app && \
-    chmod -R 777 /app  # Changed to 777 to allow full permissions
+# RUN mkdir -p /app && \
+#     chown -R app:app /app && \
+#     chmod -R 777 /app  # Changed to 777 to allow full permissions
 
 # Copy the application from the builder
 COPY --from=builder --chown=app:app /app /app
@@ -40,7 +40,7 @@ WORKDIR /app
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Switch to non-root user
-USER app
+# USER app
 
 # Set up the entrypoint to activate the virtual environment
 ENTRYPOINT ["/bin/bash", "-c", "source .venv/bin/activate && exec $0 $@"]
