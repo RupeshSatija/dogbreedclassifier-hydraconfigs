@@ -25,11 +25,21 @@ FROM python:3.12-slim-bookworm
 # Create a non-root user
 RUN useradd -m app
 
+# Create necessary directories and set permissions
+RUN mkdir -p /app && \
+    chown -R app:app /app && \
+    chmod -R 755 /app
+
 # Copy the application from the builder
 COPY --from=builder --chown=app:app /app /app
 
 # Set the working directory
 WORKDIR /app
+
+# Ensure app user has write permissions to necessary directories
+RUN mkdir -p /app/logs && \
+    chown -R app:app /app/logs && \
+    chmod -R 755 /app/logs
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
