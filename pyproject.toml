@@ -19,11 +19,15 @@ dependencies = [
     "rootutils>=1.0.7",
     "tensorboard>=2.18.0",
     "timm>=1.0.9",
-    "torch==2.4.1+cpu",
-    "torchvision==0.19.1+cpu",
+#   "torch==2.4.1+cpu",
+#   "torchvision==0.19.1+cpu",
+    "torch==2.4.1",
+    "torchvision==0.19.1",
+    "bitsandbytes==0.42",
+    "dvc-gdrive==3.0.1",
 ]
 
-
+# pip install torch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1
 [tool.coverage.report]
 include = ["src/**/*.py"]
 show_missing = true
