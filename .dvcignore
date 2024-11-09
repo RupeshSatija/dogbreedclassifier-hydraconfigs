@@ -1,3 +1,48 @@
-# Add patterns of files dvc should ignore, which could improve
-# the performance. Learn more at
-# https://dvc.org/doc/user-guide/dvcignore
+# Development and IDE files
+.env
+.venv
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Distribution/packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# DVC specific
+/dvc.lock
+/dvc.yaml
+.dvc/tmp
+
+# MLflow
+mlruns/
+
+# Logs and temporary files
+logs/
+*.log
+tmp/
+temp/
+
+# Model specific (if you don't want to track these with DVC)
+# wandb/
+# tensorboard/
+# lightning_logs/
+
+# Large files that shouldn't be tracked
+*.tar.gz
+*.zip

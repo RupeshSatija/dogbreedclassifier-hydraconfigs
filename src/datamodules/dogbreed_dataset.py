@@ -1,21 +1,12 @@
 import os
-import shutil
-import zipfile
 from typing import Optional
 
-import gdown
 import lightning as L
 from torch.utils.data import DataLoader, random_split
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
-DATASET_FLAG_FILE = "dataset_downloaded.txt"
 
-# Setup root directory
-# root = rootutils.setup_root(__file__, pythonpath=True)
-
-
-# https://drive.google.com/file/d/1WZ_H2GxgNr7_HWtJHgmy70d7R2_QMBZ2/view?usp=sharing
 class DogBreedDataModule(L.LightningDataModule):
     def __init__(
         self,
@@ -24,7 +15,6 @@ class DogBreedDataModule(L.LightningDataModule):
         num_workers: int,
         pin_memory: bool,
         train_val_test_split: list,
-        google_drive_id: str,
         image_size: int,
         crop_size: int,
     ):
@@ -34,7 +24,6 @@ class DogBreedDataModule(L.LightningDataModule):
         self.num_workers = num_workers
         self.pin_memory = pin_memory
         self.train_val_test_split = train_val_test_split
-        self.google_drive_id = google_drive_id
         self.image_size = image_size
         self.crop_size = crop_size
 
@@ -42,29 +31,11 @@ class DogBreedDataModule(L.LightningDataModule):
         self.class_names = None
 
     def prepare_data(self):
-        if not os.path.exists(f"{self.dir}/{DATASET_FLAG_FILE}"):
-            os.makedirs(self.dir, exist_ok=True)
-            zip_path = os.path.join(self.dir, "dog_breeds.zip")
-            print(f"id={self.google_drive_id}")
-            gdown.download(id=self.google_drive_id, output=zip_path, quiet=False)
-            print(f"Downloaded file {zip_path}")
-
-            with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                zip_ref.extractall(self.dir)
-
-            with open(f"{self.dir}/{DATASET_FLAG_FILE}", "w") as f:
-                f.write("Dataset downloaded successfully")
-
-            os.remove(zip_path)
-
-            extracted_dir = os.path.join(self.dir, "dataset")
-            if os.path.exists(extracted_dir):
-                for item in os.listdir(extracted_dir):
-                    s = os.path.join(extracted_dir, item)
-                    d = os.path.join(self.dir, item)
-                    print(f"Moving {s} to {d}")
-                    shutil.move(s, d)
-                os.rmdir(extracted_dir)
+        # DVC will handle the data pulling, so we just verify the directory exists
+        if not os.path.exists(self.dir):
+            raise RuntimeError(
+                f"Data directory {self.dir} not found. Please run 'dvc pull' to fetch the data."
+            )
 
     @property
     def normalize_transform(self):

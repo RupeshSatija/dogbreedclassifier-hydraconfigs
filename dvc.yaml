@@ -1,0 +1,6 @@
+stages:
+  prepare_data:
+    cmd: mkdir -p data/dogbreed
+    outs:
+      - data/dogbreed:
+          persist: true
