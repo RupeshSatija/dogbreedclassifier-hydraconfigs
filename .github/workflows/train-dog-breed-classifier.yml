@@ -5,7 +5,7 @@ on:
     workflows: ["Test Classifier Code and Create Docker Image"]
     types:
       - completed
-    branches: [main]  # Add this to specify which branch to run on
+    branches: [dvc]  # Add this to specify which branch to run on
 
 env:
   REGISTRY: ghcr.io

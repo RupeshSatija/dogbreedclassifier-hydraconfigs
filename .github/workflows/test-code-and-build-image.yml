@@ -2,7 +2,7 @@ name: Test Classifier Code and Create Docker Image
 
 on:
   push:
-    branches: [ main ]
+    branches: [ dvc ]
   workflow_dispatch:
 
 env:
