@@ -27,13 +27,13 @@ jobs:
     - name: Setup DVC
       uses: iterative/setup-dvc@v1
 
-    - name: Configure DVC remote
+    - name: Configure DVC credentials
       env:
-        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+        GDRIVE_CLIENT_ID: ${{ secrets.GDRIVE_CLIENT_ID }}
+        GDRIVE_CLIENT_SECRET: ${{ secrets.GDRIVE_CLIENT_SECRET }}
       run: |
-        dvc remote add -d myremote gdrive://your-folder-id
-        echo "$GDRIVE_CREDENTIALS_DATA" > gdrive-credentials.json
-        dvc remote modify --local myremote credentialpath gdrive-credentials.json
+        dvc remote modify --local gdrive gdrive_client_id "$GDRIVE_CLIENT_ID"
+        dvc remote modify --local gdrive gdrive_client_secret "$GDRIVE_CLIENT_SECRET"
 
     - name: Pull DVC data
       run: dvc pull
