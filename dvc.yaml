@@ -1,6 +1,9 @@
 stages:
-  prepare_data:
-    cmd: mkdir -p data/dogbreed
+  train:
+    cmd: python src/train.py
+    deps:
+    - configs/experiment/dogbreed_ex.yaml
+    - src/train.py
     outs:
-      - data/dogbreed:
-          persist: true
+    - logs:
+        cache: false

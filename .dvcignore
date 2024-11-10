@@ -26,14 +26,13 @@ htmlcov/
 
 # DVC specific
 /dvc.lock
-/dvc.yaml
+
 .dvc/tmp
 
 # MLflow
 mlruns/
 
 # Logs and temporary files
-logs/
 *.log
 tmp/
 temp/
