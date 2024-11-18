@@ -82,7 +82,7 @@ def config_concrete():
             "seed": 42,
             "paths": {"log_dir": "logs"},
             "data": {
-                "dir": "./data/dogbreeds",
+                "dir": "./data/dogbreed",
                 "batch_size": 32,
                 "num_workers": 0,
                 "pin_memory": False,

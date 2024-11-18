@@ -69,7 +69,7 @@ def test_transform_sizes(datamodule):
         for t in datamodule.train_transform.transforms
         if isinstance(t, transforms.RandomResizedCrop)
     ][0]
-    assert crop_transform.size == datamodule.crop_size
+    assert crop_transform.size == (datamodule.crop_size, datamodule.crop_size)
 
     resize_transform = [
         t
